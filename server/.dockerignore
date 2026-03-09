@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env.local
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
+.idea
+*.iml
+node_modules
+dist
+build
