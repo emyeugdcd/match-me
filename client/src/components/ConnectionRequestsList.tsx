@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import connectionService, { type ConnectionRequest } from '../services/connectionService';
 import ConnectionRequestCard from './ConnectionRequestCard.tsx';
 
@@ -15,22 +15,22 @@ const ConnectionRequestsList: React.FC<ConnectionRequestsListProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
       const receivedRequests = await connectionService.getReceivedRequests();
       setRequests(receivedRequests);
       onRequestsUpdate?.(receivedRequests.length);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load connection requests');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load connection requests');
     } finally {
       setLoading(false);
     }
-  };
+  }, [onRequestsUpdate]);
 
   useEffect(() => {
     fetchRequests();
-  }, [refreshTrigger]);
+  }, [fetchRequests, refreshTrigger]);
 
   const handleAccept = async (requestId: number) => {
     try {
@@ -38,8 +38,8 @@ const ConnectionRequestsList: React.FC<ConnectionRequestsListProps> = ({
       // Remove the accepted request from the list
       setRequests(prev => prev.filter(req => req.id !== requestId));
       onRequestsUpdate?.(requests.length - 1);
-    } catch (err: any) {
-      setError(err.message || 'Failed to accept request');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to accept request');
     }
   };
 
@@ -49,8 +49,8 @@ const ConnectionRequestsList: React.FC<ConnectionRequestsListProps> = ({
       // Remove the dismissed request from the list
       setRequests(prev => prev.filter(req => req.id !== requestId));
       onRequestsUpdate?.(requests.length - 1);
-    } catch (err: any) {
-      setError(err.message || 'Failed to dismiss request');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to dismiss request');
     }
   };
 
@@ -61,8 +61,8 @@ const ConnectionRequestsList: React.FC<ConnectionRequestsListProps> = ({
         setRequests([]);
         onRequestsUpdate?.(0);
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to accept all requests');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to accept all requests');
     }
   };
 
@@ -73,8 +73,8 @@ const ConnectionRequestsList: React.FC<ConnectionRequestsListProps> = ({
         setRequests([]);
         onRequestsUpdate?.(0);
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to dismiss all requests');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to dismiss all requests');
     }
   };
 

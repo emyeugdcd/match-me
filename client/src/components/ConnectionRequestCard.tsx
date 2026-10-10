@@ -26,8 +26,8 @@ const ConnectionRequestCard: React.FC<ConnectionRequestCardProps> = ({
 
     try {
       await onAccept(request.id);
-    } catch (err: any) {
-      setActionError(err.message || 'Failed to accept request');
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to accept request');
     } finally {
       setIsProcessing(false);
     }
@@ -39,8 +39,8 @@ const ConnectionRequestCard: React.FC<ConnectionRequestCardProps> = ({
 
     try {
       await onDismiss(request.id);
-    } catch (err: any) {
-      setActionError(err.message || 'Failed to dismiss request');
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to dismiss request');
     } finally {
       setIsProcessing(false);
     }

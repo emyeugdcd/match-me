@@ -13,19 +13,21 @@ const OnlineIndicator: React.FC<OnlineIndicatorProps> = ({ userId, showLabel = f
     useEffect(() => {
         console.log('OnlineIndicator: register handlers for user', userId);
         // Listen for status updates
-        const handleStatusUpdate = (payload: any) => {
+        const handleStatusUpdate = (payload: unknown) => {
+            const data = payload as { user_id?: number; status?: string };
             console.log('OnlineIndicator: user_status received', payload);
-            if (payload.user_id === userId) {
-                setIsOnline(payload.status === 'online');
+            if (data?.user_id === userId) {
+                setIsOnline(data?.status === 'online');
             }
         };
 
         socketService.on('user_status', handleStatusUpdate);
         
         // Listen for presence list when first connecting
-        const handlePresenceList = (payload: any) => {
+        const handlePresenceList = (payload: unknown) => {
+            const data = payload as { user_ids?: number[] };
             console.log('OnlineIndicator: presence_list received', payload);
-            const ids: number[] = payload.user_ids || [];
+            const ids: number[] = data?.user_ids || [];
             setIsOnline(ids.includes(userId));
         };
 
@@ -40,7 +42,7 @@ const OnlineIndicator: React.FC<OnlineIndicatorProps> = ({ userId, showLabel = f
                 if (typeof data.online === 'boolean') {
                     setIsOnline(data.online);
                 }
-            } catch (err) {
+            } catch {
                 // ignore
             }
         };
@@ -52,7 +54,7 @@ const OnlineIndicator: React.FC<OnlineIndicatorProps> = ({ userId, showLabel = f
                 console.log('OnlineIndicator: using cached socket status', cached);
                 setIsOnline(cached);
             }
-        } catch (e) {
+        } catch {
             // swallow
         }
 

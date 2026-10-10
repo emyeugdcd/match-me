@@ -20,8 +20,8 @@ const RecommendationsPage: React.FC = () => {
             setLoading(true);
             const data = await recommendationService.getRecommendations();
             setRecommendations(data || []);
-        } catch (err: any) {
-            setError(err.message || 'Failed to load recommendations');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to load recommendations');
         } finally {
             setLoading(false);
         }
@@ -33,8 +33,8 @@ const RecommendationsPage: React.FC = () => {
             // Remove from list or show success state
             setRecommendations(prev => prev.filter(rec => rec.user_id !== userId));
             alert('Connection request sent!');
-        } catch (err: any) {
-            alert(err.message || 'Failed to send request');
+        } catch (err) {
+            alert(err instanceof Error ? err.message : 'Failed to send request');
         }
     };
 
@@ -42,7 +42,7 @@ const RecommendationsPage: React.FC = () => {
         try {
             await recommendationService.dismissRecommendation(userId);
             setRecommendations(prev => prev.filter(rec => rec.user_id !== userId));
-        } catch (err: any) {
+        } catch (err) {
             console.error('Failed to dismiss recommendation:', err);
             // Optional: show error to user
         }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProfileView from '../components/ProfileView';
 import profileService from '../services/profileService';
@@ -18,11 +18,7 @@ const ProfilePage: React.FC = () => {
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
-  useEffect(() => {
-    loadProfile();
-  }, [userId]);
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -57,12 +53,16 @@ const ProfilePage: React.FC = () => {
         const status = await connectionService.checkConnectionStatus(targetUserId);
         setConnectionStatus(status);
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to load profile');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load profile');
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
 
   const handleEdit = () => {
     navigate('/profile/edit');
@@ -78,8 +78,8 @@ const ProfilePage: React.FC = () => {
       // Reload connection status
       const status = await connectionService.checkConnectionStatus(basicInfo.id);
       setConnectionStatus(status);
-    } catch (err: any) {
-      alert(err.message || 'Failed to send connection request');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to send connection request');
     } finally {
       setActionLoading(false);
     }
@@ -97,8 +97,8 @@ const ProfilePage: React.FC = () => {
         const status = await connectionService.checkConnectionStatus(basicInfo.id);
         setConnectionStatus(status);
       }
-    } catch (err: any) {
-      alert(err.message || 'Failed to accept connection request');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to accept connection request');
     } finally {
       setActionLoading(false);
     }

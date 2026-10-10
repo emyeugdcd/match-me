@@ -105,7 +105,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 
   const handleProfileChange = (field: ProfileStringField, value: string) => {
     setProfileForm(prev => {
-      const updates: any = { [field]: value };
+      const updates: Partial<ProfileFormState> = { [field]: value };
 
       // Auto-set coordinates if location matches a known city
       if (field === 'location' && CITY_COORDINATES[value]) {
@@ -143,7 +143,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     }));
   };
 
-  const handleBioChange = (field: keyof BioFormState, value: any) => {
+  const handleBioChange = <K extends keyof BioFormState>(field: K, value: BioFormState[K]) => {
     setBioForm(prev => ({ ...prev, [field]: value }));
   };
 
@@ -221,8 +221,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 
       // Reset success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
-      setError(err.message || 'Failed to save profile');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save profile');
     } finally {
       setLoading(false);
     }

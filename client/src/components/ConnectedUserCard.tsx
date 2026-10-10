@@ -33,8 +33,8 @@ const ConnectedUserCard: React.FC<ConnectedUserCardProps> = ({
 
     try {
       await onDisconnect(connection.user_id);
-    } catch (err: any) {
-      setActionError(err.message || 'Failed to disconnect');
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to disconnect');
     } finally {
       setIsProcessing(false);
     }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { chatService } from '../services/chatService';
 import socketService from '../services/socketService';
@@ -20,7 +20,7 @@ const ChatPage = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const fetchMessages = async () => {
+    const fetchMessages = useCallback(async () => {
         if (!userId) return;
         try {
             const data = await chatService.getMessages(parseInt(userId));
@@ -31,15 +31,17 @@ const ChatPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [userId]);
 
     useEffect(() => {
         fetchMessages();
 
         // Listen for real-time messages
-        const handleNewMessage = (payload: any) => {
+        const handleNewMessage = (payload: unknown) => {
+            const data = payload as { payload: import("../types/message").Message };
+            const msg = data.payload;
             // Check if message belongs to this chat
-            const msg = payload.payload; // The message object is nested in payload.payload
+            // Handled above
 
             // If the message is from the current chat partner OR from us (echoed)
             if (msg.sender_id === parseInt(userId || '0') || msg.sender_id === currentUser?.id) {
@@ -51,8 +53,9 @@ const ChatPage = () => {
             }
         };
 
-        const handleTyping = (payload: any) => {
-            if (payload.from_user_id === parseInt(userId || '0')) {
+        const handleTyping = (payload: unknown) => {
+            const data = payload as { from_user_id?: number };
+            if (data?.from_user_id === parseInt(userId || '0')) {
                 setIsTyping(true);
                 // Clear existing timeout
                 if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
@@ -69,7 +72,7 @@ const ChatPage = () => {
             socketService.off('typing', handleTyping);
             if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
         };
-    }, [userId]);
+    }, [userId, currentUser?.id, fetchMessages]);
 
     useEffect(() => {
         scrollToBottom();

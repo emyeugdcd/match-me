@@ -52,7 +52,7 @@ export interface BioData {
   age_range_min?: number;
   age_range_max?: number;
   max_distance_km?: number;
-  additional_data?: Record<string, any>;
+  additional_data?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -116,7 +116,7 @@ export interface BioDataUpdateRequest {
   age_range_min?: number;
   age_range_max?: number;
   max_distance_km?: number;
-  additional_data?: Record<string, any>;
+  additional_data?: Record<string, unknown>;
 }
 
 export interface ConnectionRequest {
@@ -366,14 +366,14 @@ export const LOCATIONS = [
 
 export type Location = typeof LOCATIONS[number];
 
-export const isApiError = (error: any): error is ApiError => {
-  return error && typeof error.error === 'string';
+export const isApiError = (error: unknown): error is ApiError => {
+  return typeof error === 'object' && error !== null && 'error' in error && typeof (error as Record<string, unknown>).error === 'string';
 };
 
-export const isConnectionRequest = (obj: any): obj is ConnectionRequest => {
-  return obj && typeof obj.id === 'number' && typeof obj.from_user_id === 'number';
+export const isConnectionRequest = (obj: unknown): obj is ConnectionRequest => {
+  return typeof obj === 'object' && obj !== null && 'id' in obj && typeof (obj as Record<string, unknown>).id === 'number';
 };
 
-export const isProfile = (obj: any): obj is Profile => {
-  return obj && typeof obj.user_id === 'number' && typeof obj.location === 'string';
+export const isProfile = (obj: unknown): obj is Profile => {
+  return typeof obj === 'object' && obj !== null && 'user_id' in obj && typeof (obj as Record<string, unknown>).user_id === 'number';
 };

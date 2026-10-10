@@ -85,7 +85,7 @@ class ProfileService {
       try {
         profile = await this.getMyProfile();
         console.log('Profile info response:', profile); // Debug log
-      } catch (error) {
+      } catch {
         console.log('Profile not found, needs to be created');
       }
 
@@ -93,7 +93,7 @@ class ProfileService {
       try {
         bio = await this.getMyBioData();
         console.log('Bio info response:', bio); // Debug log
-      } catch (error) {
+      } catch {
         console.log('Bio not found, needs to be created');
       }
 

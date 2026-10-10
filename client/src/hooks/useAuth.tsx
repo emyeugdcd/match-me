@@ -14,6 +14,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -56,21 +57,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
-    try {
-      const authResponse = await authService.login({ email, password });
-      setUser(authResponse.user);
-    } catch (error) {
-      throw error;
-    }
+    const authResponse = await authService.login({ email, password });
+    setUser(authResponse.user);
   };
 
   const signup = async (email: string, password: string): Promise<void> => {
-    try {
-      const authResponse = await authService.signup({ email, password });
-      setUser(authResponse.user);
-    } catch (error) {
-      throw error;
-    }
+    const authResponse = await authService.signup({ email, password });
+    setUser(authResponse.user);
   };
 
   const logout = async (): Promise<void> => {

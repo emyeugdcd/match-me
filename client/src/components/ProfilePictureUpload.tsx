@@ -31,8 +31,8 @@ const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
     try {
       const result = await profileService.uploadProfilePicture(file);
       onUploadSuccess(result.profile_picture_url);
-    } catch (err: any) {
-      onUploadError(err.message || 'Failed to upload image');
+    } catch (err) {
+      onUploadError(err instanceof Error ? err.message : 'Failed to upload image');
     } finally {
       setUploading(false);
     }
@@ -73,8 +73,8 @@ const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
     try {
       await profileService.deleteProfilePicture();
       onRemovePicture();
-    } catch (err: any) {
-      onUploadError(err.message || 'Failed to remove profile picture');
+    } catch (err) {
+      onUploadError(err instanceof Error ? err.message : 'Failed to remove profile picture');
     }
   };
 

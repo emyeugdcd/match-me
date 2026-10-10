@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import connectionService, { type DetailedConnection } from '../services/connectionService';
 import ConnectedUserCard from './ConnectedUserCard.tsx';
 
@@ -19,22 +19,22 @@ const ConnectedUsersList: React.FC<ConnectedUsersListProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchConnections = async () => {
+  const fetchConnections = useCallback(async () => {
     try {
       setLoading(true);
       const detailedConnections = await connectionService.getDetailedConnections();
       setConnections(detailedConnections);
       onConnectionsUpdate?.(detailedConnections.length);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load connections');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load connections');
     } finally {
       setLoading(false);
     }
-  };
+  }, [onConnectionsUpdate]);
 
   useEffect(() => {
     fetchConnections();
-  }, [refreshTrigger]);
+  }, [fetchConnections, refreshTrigger]);
 
   const handleDisconnect = async (userId: number) => {
     if (!window.confirm('Are you sure you want to disconnect from this user?')) {
@@ -46,8 +46,8 @@ const ConnectedUsersList: React.FC<ConnectedUsersListProps> = ({
       // Remove the disconnected user from the list
       setConnections(prev => prev.filter(conn => conn.user_id !== userId));
       onConnectionsUpdate?.(connections.length - 1);
-    } catch (err: any) {
-      setError(err.message || 'Failed to disconnect');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to disconnect');
     }
   };
 

@@ -1,13 +1,13 @@
 import authService from './authService';
 
-type EventHandler = (payload: any) => void;
+type EventHandler = (payload: unknown) => void;
 
 class SocketService {
     private socket: WebSocket | null = null;
     private listeners: Map<string, EventHandler[]> = new Map();
-    private lastPayloads: Map<string, any> = new Map();
+    private lastPayloads: Map<string, unknown> = new Map();
     // For user_status we want to cache per-user last status
-    private lastUserStatuses: Map<number, any> = new Map();
+    private lastUserStatuses: Map<number, { status?: string }> = new Map();
     private reconnectAttempts = 0;
     private maxReconnectAttempts = 5;
     private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -94,7 +94,7 @@ class SocketService {
         }
     }
 
-    send(type: string, payload: any) {
+    send(type: string, payload: unknown) {
         if (this.socket?.readyState === WebSocket.OPEN) {
             this.socket.send(JSON.stringify({ type, payload }));
         } else {
@@ -147,16 +147,16 @@ class SocketService {
         }
     }
 
-    private emit(event: string, payload: any) {
+    private emit(event: string, payload: unknown) {
         // Cache the last payload for this event
         try {
             this.lastPayloads.set(event, payload);
-        } catch (e) {}
+        } catch { /* ignore */ }
         // Special-case: cache per-user status for user_status events
-        if (event === 'user_status' && payload && payload.user_id !== undefined) {
+        if (event === 'user_status' && typeof payload === 'object' && payload !== null && 'user_id' in payload) {
             try {
-                this.lastUserStatuses.set(payload.user_id, payload);
-            } catch (e) {}
+                this.lastUserStatuses.set(Number((payload as Record<string, unknown>).user_id), payload as { status?: string });
+            } catch { /* ignore */ }
         }
         const handlers = this.listeners.get(event);
         if (handlers) {

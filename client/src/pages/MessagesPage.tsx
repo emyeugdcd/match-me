@@ -16,8 +16,8 @@ const MessagesPage = () => {
             try {
                 const data = await chatService.getChats();
                 setChats(data || []);
-            } catch (err: any) {
-                setError(err.message || 'Failed to load messages');
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to load messages');
             } finally {
                 setLoading(false);
             }

@@ -71,7 +71,7 @@ export const recommendationService = {
                     is_viewed: true,
                     is_dismissed: false
                 } as Recommendation;
-            } catch (e) {
+            } catch {
                 return null;
             }
         });
